@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Angular Notes</title>
+</head>
+<body>
+<ul>Component</ul>
+<li>
+  Angular Directive with template
+  @Component({meta data such as selector})
+  Data Binding:
+  >One way:{{}} bind to component instance (AngularJS bind to either $scope or controller instance)
+  >Attribute Binding:[href]
+  >Event Binding:(input)
+  >Two way:needs FormsModule to use[(ngModel)] banana in a box.Or use[value](input) etc.
+</li>
+<h4>Module System -ES6 feature</h4>
+<li>
+  Named export: can have multiple, need to match variable name when import
+  default export:use default keyword , can only have one per file, no need to match name.
+</li>
+<h4>Directives</h4>
+<li>
+  >Attribute Directive
+    Changed DOM element/component attribute  i.e. [routerLink]
+  >Structural Directive
+    manipulate DOM structure. *ngFor *ngIf(else syntax introduced @Angular 4), can use only one per element
+</li>
+<h4>Custom Directive - either attribute or structure</h4>
+<li>
+  @Directive({selector: '[]'})
+  ViewContainer, Template (ViewContainerRef :get reference to ViewContainer ...
+  template is web component standard,Angular use ng-template to implement that
+</li>
+<h4> **** Component Communication</h4>
+<li>
+  Parent => Child
+    >In Child ,use @Input('option to match variable name') to specify the variable
+      which is used to receive data from parent
+    >In Parent, use attribute binding to pass parent data to child through attribute on Child element
+  Child ->Parent
+    >In Child ,Create an EventEmitter with @Output() to emit an event which carries data to parent.
+    >In Parent, use event binding to listen to the event and extract data($event)
+  Service
+    @Injectable({providedIn: 'root or other module' //introduced in angular 6})
+      before angular 6, declare service in provides: []
+    Inject service in constructor
+    Injected serviec should be public if it's used in tempaltes. otherwise, angular AOT compiler will complain
+</li>
+
+<h4>Routing</h4>
+<li>
+    >RouterModule.forRoot() configure routing for app module(root level)
+    >RouterModule.forChild() configure sub-routing, or nested routing.
+    >route object:path, component,canActivate/canLoad, loadChildren, redirectTo
+    >use routerLink for changing route(URL)
+    >router-outlet as a placeholder to load components
+      If the first segment begins with /, the router will look up the route from the root of the app.
+      If the first segment begins with ./, or doesn't begin with a slash, the router will instead look in the children of the current activated route.
+      And if the first segment begins with ../, the router will go up one level.
+  >router-outlet as a placeholder to load components
+
+    ActivatedRoute : an object hold info about current routing
+    snapshot:snapshot of current active routing
+
+  Lazy loading module: loadChildren, syntax is different between angular 8 and 7 (or before)
+  Guard Service
+</li>
+
+<h4>Local Storage</h4>
+<li>Lite weight database for browser.
+  data will not be cleared after page refresh or closed
+  Key/value pair in string format
+  no expiration time
+</li>
+<h4>Pipe</h4>
+<li>
+  @Pipe({name:string, pure:boolean})
+  >a function which transform data format in template.
+  >pure change:primitive value change or array/object reference change
+  >impure change: array element change or object property change
+  >pure pipe: can detect pure change only
+  >impure pipel can detect both pure change and impure change
+
+  Async pipe: observable/promise | async automatically listens to the value change
+</li>
+
+<h4>View Encapsulation</h4>
+<li>
+  Encapsulate CSS styles for component
+  ViewEncapsulation.ShadowDom (100%)
+  Component style won't go outside, outside styles can't go inside
+  ViewEncapsulation.Emulated (50%)
+  Component style won't go outside, outside styles can go inside
+  ViewEncapsulation.None (0%)
+  Component style can go outside, outside styles can't go inside
+</li>
+
+<h4>HTTP</h4>
+<li>HttpClientModule(Before 4.3, It's called  HttpModule
+HttpClient service to send ajax request, return type is observable, can ise .toPromise to turn to promise
+</li>
+
+<h4>Reactive Programming</h4>
+<li>
+  Observable(form rxjs -Reactive extension JavaScript)
+    >Observable is a data source object which fcan continuously send data to all its subsribers/observers overtime
+    >can preprocess fata using .pipe() and apply rxjs operators, i.e.map, switchMap
+    >Lazy, if no subscribe, it won't execute
+  Form support
+    > collect user's input, form validations, form data submission
+    > ngForm(and novalidate) auto added by angular to form element
+    prevent default form submission. create a FormGroup object
+    > ngModel + name
+    will instruct angular to take control the input, create formControl obj
+    > ngModelGroup
+    ******************************
+    > Template-driven forms (Angular built-in directive/component)
+    all logics(config, validation, submission) go inside the template
+    simple form
+    not easy for unit testing
+    angular will create form instance/object(not accessible to devs)
+    > Reactive forms
+    most of the logics live in component
+    use some directive attribute bindings provided in ReactiveFormsModule
+    complicated/customized form
+    easy for unit test
+    developers will create form instances/objects to control the form
+    > Form Validation
+    errors -> null, no validation error
+    errors -> {required: 'error msg', minlength: 'error msg'}
+    validator is a func takes form instances and return validation errors
+    states: touched, valid, ditry/pristine, submitted
+</li>
+<li>How to access DOM element/Child element in angular component?
+@ViewChild/@ViewChildren @ContentChild/@ContentChildren
+  Directive can use@HostBinding @HostListener to modify DOM element attribute or add listener
+</li>
+<h4>Change Detection</h4>
+<li>
+
+  The process Angular runs to synchronise model and view.(Compare with AngularJS Digest Cycle)
+  Monkey patching -a technology to path browser native APIs(addEventListener, setTimeout)
+    it will notify angular when async operation(ajax, browser event, timed event)finshed
+  zone.js  a library to do monkey patching ,angular use ngZone to implemen zone.js
+
+  Change detection will run all change detectors starting from toot component
+  OnPush strategy can be used to further optimize angular performance
+  LifeCycle - component/directive HookMethod
+  constructor
+  ngOnInit - data initialization
+  ngOnDestroy - before component will be destroyed.e.g. navigate away.
+  ngOnChanges - will be invoked whenever input data binding changes(pure change)
+  ngDoCheck - invoked when parent change detector runs
+  // for component only
+  ngAfterViewInit - invoked after child/DOM components ready
+  ngAfterViewChecked
+  ngAfterContentInit - invoked after contents passed from parents done initialization
+  ngAfterContentChecked
+</li>
+
+<li>Automation Test
+driver selenium, angular use protractor to do automation test.
+  ng e2e to start the automation test
+</li>
+<li>
+  unit testing
+  Karma +Jasmin to do init testing
+  Karma is the test runner,testing framework
+  Jasmine is the assertion library
+
+  keywords:
+  Stub: predefine behaviors
+  spy: special stub, can take record of invoke count
+  mock: fake an object with behaviors you defined
+</li>
+</body>
+</html>

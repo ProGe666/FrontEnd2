@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Demo 02</title>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+	<script type="text/javascript" src="js/angular.min.js"></script>
+	<script type="text/javascript">
+		var app = angular.module('mainApp', []);
+		app.controller('mainCtrl', ['$scope', function mainCtrl($scope) {
+			$scope.user = {
+				name: 'bob',
+				age: 21
+			};
+
+			$scope.itemList = [
+				{itemNo: "A001", price: 10, qty: 30, inStock: true},
+				{itemNo: "A002", price: 20, qty: 3, inStock: true},
+				{itemNo: "A003", price: 25, qty: 5, inStock: false},
+				{itemNo: "A004", price: 15, qty: 8, inStock: true}
+			];
+
+			$scope.flag = true;
+		}]);
+	</script>
+</head>
+<body ng-app="mainApp" class="container">
+	<div ng-controller="mainCtrl">
+		<form class="form-group">
+			Name: <input class="form-control" type="text" ng-model="user.name">
+			Age: <input class="form-control" type="number" ng-model="user.age">
+			<p>{{user}}</p>
+		</form>
+		<hr>
+		<h2>Bindings for Array</h2>
+		<table class="table table-bordered table-striped">
+			<thead>
+				<tr>
+					<th>Item No.</th>
+					<th>Price</th>
+					<th>Quantity</th>
+					<th>Stock</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="item in ::itemList">
+					<td>{{item.itemNo}}</td>
+					<td>{{item.price}}</td>
+					<td>{{item.qty}}</td>
+					<td>{{item.inStock}}</td>
+				</tr>
+			</tbody>
+		</table>
+		<h2>Conditional Binding</h2>
+		<input type="checkbox" ng-model="flag">
+		<!-- using display: none -->
+		<p ng-show="!flag"> login </p>
+		<!-- ng-if will dynamically add/remove element from DOM -->
+		<p ng-if="flag">Logout</p>
+	</div>
+</body>
+</html>

@@ -1,0 +1,60 @@
+<!-- Digest Cycle-->
+<!--
+    How angularjs synchronize model and view
+    - internally it keeps an array of watchers(watch list) dirty check?
+        a process angularjs run all watchers and detect changes
+        built in watchers:data binding in views,
+        custom ones: $scope.$watch() ====> watcher
+    -normally angularjs will execute detect changes 2 times if there is a value change.(run once if none)
+    -it will run maximum 10 times and throw errors
+
+    two way to manully trigger digest cycle:
+        $scope.$digest()
+        $scope.$apply()
+
+    ********what will trigger DC? async
+
+    1.Browser events
+    2.Ajax requests
+    3.Timed events(setTimeout, setInterval)
+-->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Demo 09</title>
+    <script type="text/javascript" src = "./js/angular.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css"/> 
+
+    <script type ="text/javascript">
+        angular
+            .module('mainApp',[])
+            .controller('firstCtrl',['$scope','$rootscope','$sce',function firstCtrl($scope,$rootscope,$sce){
+                $scope.msg = 'w';
+                //1st way
+                //use a library to sanitize html
+               //$scope.msgHTML ='<h2>Hi</h2>';
+              $scope.msgHTML = $sce.trustAsHtml('<h2>Hi</h2>');
+
+                // noraml setTimeout is JS to set a time out
+              setTimeout(function (){
+                  $scope.msg ='YYYY';
+                  console.log($scope.msg);
+                  //node
+                  //will run digest cycle from current scope
+                  //$scope.$digest();
+                //will trigger dc from rootScoppe
+                $scope.$apply();
+              },3000);
+            }])
+    </script>
+</head>
+<body ng-app = "mainApp">
+    <div ng-controller="firstCtrl">
+        <P ng-bind ="msg"></P>
+        <!-- XSS attack may happen-->
+        <P ng-bind-html ="msgHTML"></P>
+    </div> 
+    
+</body>
+</html>

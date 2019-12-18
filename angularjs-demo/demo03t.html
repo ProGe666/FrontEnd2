@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>
+		Demo 03
+	</title>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+	<script type="text/javascript" src="js/angular.min.js"></script>
+	<script type="text/javascript">
+		var app = angular.module('mainApp', []);
+		app.controller('mainCtrl', ['$scope', '$rootScope', function mainCtrl($scope, $rootScope) {
+			$scope.x = 10;
+			// communicate between controller
+			// 1. $rootScope
+			// 2. events
+			// 3. service (preferred)
+			$rootScope.user = {name: ''};
+
+			// listen... and broadcast to all its descendants
+			$scope.$on('updateA', function onAEmitted(event, a) {
+				$scope.$broadcast('updateB', a);
+			})
+		}]);
+		app.controller('firstCtrl', ['$scope', 'address', function firstCtrl($scope, address) {
+			$scope.y = 20;
+			$scope.a = 0;
+			// emit ...  whenever a changes, emit 'updateA' event containing a
+			// to all ancestors;
+			$scope.$watch('a', function checkValue( newVal, oldVal ) {
+				if(oldVal !== newVal) {
+					$scope.$emit('updateA', newVal);
+				}
+			});
+
+			//service
+			$scope.address = address;
+
+		}]);
+		app.controller('secondCtrl', ['$scope', 'address', function secondCtrl($scope, address) {
+			// $scope will inherit parent's scope, it's on his prototype chain
+			$scope.x = 11;
+
+			$scope.b = 0;
+			// listen to ancestors...
+			$scope.$on('updateB', function onABroadcasted(event, a) {
+				console.log(a);
+				$scope.b = 2 * a + 3;
+			})
+
+
+			$scope.address = address;
+		}]);
+
+		app.value('address', {
+			city: 'Princeton',
+			state: 'NJ'
+		});
+	</script>
+	<style type="text/css">
+		[ng-controller='mainCtrl'] {
+			width: 400px;
+			height: 600px;
+			border: 4px solid;
+			padding: 5px;
+		}
+		[ng-controller='firstCtrl'] {
+			width: 300px;
+			height: 230px;
+			border: 2px dotted red;
+			margin-bottom: 5px;
+			padding: 5px;
+		}
+		[ng-controller='secondCtrl'] {
+			width: 300px;
+			height: 230px;
+			border: 2px dashed blue;
+			padding: 5px;
+		}
+	</style>
+</head>
+<body class="container" ng-app="mainApp">
+	<div ng-controller="mainCtrl">
+		<h4>mainCtrl:</h4>
+		<p>x: {{x}}</p>
+		<p>y: {{y}}</p>
+		
+		
+		<div ng-controller="firstCtrl">
+			<h4>firstCtrl:</h4>
+			<p>x: {{x}}</p>
+			<p>y: {{y}}</p>
+			<p>User name: <input type="text" ng-model="user.name"></p>			
+			<p>a: <input type="number" ng-model="a"></p>
+
+			<p>City: {{address.city}}</p><p>State: {{address.state}}</p>
+
+		</div>
+		<div ng-controller="secondCtrl">
+			<h4>secondCtrl:</h4>
+			<p>x: {{x}}</p>
+			<p>y: {{y || 'undefined'}}</p>
+			<p>User name: {{user.name}}</p>
+			<p>b=2a + 3 = {{b}}</p>
+			<p>City: <input type="text" ng-model="address.city"></p>
+			<p>State: <input type="text" ng-model="address.state"></p>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,34 @@
+<h2>Home</h2>
+<app-parent></app-parent>
+<app-product-overview [prod]="product"></app-product-overview>
+
+<h4>Directive</h4>
+<ul>
+  <li>Attribute directive</li>
+  <li>Structural directive</li> <!-- modify DOM elements-->
+</ul>
+
+<p>
+  input: <input type="text" [(ngModel)]="myClass">
+</p>
+
+<!-- ngClass one can receive condition -->
+<p [ngClass]="{'btn-danger': myClass==='danger','btn-success': myClass === 'success'}">Magic Class</p>
+<!-- ngStyle -->
+<p [class]="myClass">Another Magic Class</p>
+
+<hr> <!-- HoRizontal line-->
+<input type="checkbox" [(ngModel)]="flag">
+<!--<p *ngIf="flag">Login</p>-->
+<p appMyShow [show]="!flag">Logout</p>
+
+<!--<p *appMyIf="flag">Login</p>--> <!-- sugar syntax -->
+<!-- ng-template is an angular implementation of template-->
+<ng-template [appMyIf]="flag">
+  <p appColorRedAlertHello>Login</p>
+</ng-template>
+
+<template>
+  Hi, can you see me?
+</template>
+

@@ -1,0 +1,57 @@
+<!-- ui-router -->
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Demo 08</title>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+	<script type="text/javascript" src="js/angular.min.js"></script>
+	<script type="text/javascript" src="js/angular-ui-router.min.js"></script>
+	<script type="text/javascript">
+		var app = angular.module('mainApp', ['ui.router']);
+		app.config(['$stateProvider', function stateProvider($stateProvider){
+			var homeState = {
+					name: 'home',
+					url: '/home',
+					templateUrl: 'ui-template/home.html'
+				},
+				userState = {
+					name: 'users',
+					url: '/users',
+					templateUrl: 'ui-template/users.html'
+				},
+				usersAllState = {
+					name: 'users.all',
+					url: '/all',
+					templateUrl: 'ui-template/all.html'
+				},
+				usersAddState = {
+					name: 'users.add',
+					url: '/add',
+					templateUrl: 'ui-template/add.html'
+				};
+			$stateProvider.state(homeState).state(userState).state(usersAllState).state(usersAddState);
+		}]);
+	</script>
+</head>
+<body ng-app="mainApp">
+	<!-- using semantic element for SEO and WEB Accessibility(disables)
+		 1. screen reader can read those well. 2. keyboard navigation
+		 aria label
+	 -->
+	<header>
+		<nav class="navbar navbar-default">
+			<div class="container">
+				<ul class="nav navbar-nav">
+					<li>
+						<a ui-sref="home">Home</a>
+					</li>
+					<li>
+						<a ui-sref="users">Users</a>
+					</li>
+				</ul>	
+			</div>
+		</nav>
+	</header>
+	<div ui-view></div>
+</body>
+</html>

@@ -1,0 +1,62 @@
+<!DOCTYPE <!DOCTYPE html>
+<html>
+<head>
+    <title>Demo 01</title>
+    <script type="text/javascript" src = "./js/angular.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css"/>
+   
+    <script type ="text/javascript">
+    
+    // 1st param:module name,2 nd param:dependency module array
+    // if you don't specify the second param, angularjs will try to find the module by name
+  
+        angular.module('mainApp', []);
+        var app = angular.module('mainApp');
+        //1 st param = controller name,
+        //when you create a controller, anguarjs will create a scope
+        // $scope is from dependency injectionby angular js container
+        
+        app.controller('firstCtr', function firstCtrl($scope){
+            $scope.msg = 'hello world';
+        });
+        //second param is to fix minificationo problem
+        app.controller('secondCtrl',['$scope','$timeout',function
+            secondCtrl(s,$timeout){
+                s.smsg = 'Hello anqular js';
+                $timeout(function(){
+                    s.msg = 'King'
+                },2000);
+            // (s,t){
+            //    //matched by the position
+            // }
+            
+        }]);
+
+        app.controller('thirdCtrl', [function thirdCtrl(){
+            this.msg = 'on controller instance';
+        }]);
+    </script>
+</head>
+<body ng-app = "mainApp">
+    <div ng-conroller = "firstCtr">
+        {{msg}}
+        <p>One Way binding: Model ==> View</p>
+    </div>
+    <div ng-conroller = "secondCtrl">
+        {{msg}}
+        <p>Two way binding: Modlel ==> View</p>
+        <input class ="form-controll type ="test" ng-model="msg">
+        
+        <!--if is value of undefined, the watcher will go on
+            if is value of  nulkl, -->
+
+        <p>One time binding: Model ==> View once</p>
+        <!--use double caller before  -->
+        {{::msg}}
+    </div> 
+    <!--use controller as syntax to get controller instance-->
+    <div ng-controller = "thirdCtrl as tc">
+        {{tc.msg}}
+    </div>   
+</body>
+</html>

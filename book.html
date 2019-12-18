@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Books</title>
+	<script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+	 <link rel="stylesheet" type="text/css" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.16.0/umd/popper.min.js"></script>
+	 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script>
+	<script type="text/javascript">
+		var link = 'https://shrouded-dusk-88966.herokuapp.com'
+		var xhr = new XMLHttpRequest();
+		xhr.open('GET', link+'/books');
+		xhr.responseType = 'json';
+		xhr.onload = function onload(){
+			//research status code
+			if(this.readyState ===4 && this.status ===200){
+				console.log(this.response); // xhr.response
+			}
+			//console.log('response');
+		};
+
+		xhr.send();
+		//refresh the table infor
+		function refershTableInfo(books){
+				$('tbody').empty();
+				books.forEach(function(b){
+					$('tbody').append(
+						'<tr class="trClass"><td>'+b.id+'</td><td class="name">'+b.name+'</td><td class="price">'+b.price+'</td><td class="author">'+b.author+'</td><td><button type="button" class="btn btn-link edit">Edit</button><button type="button" class="btn btn-link delete">Delete</button></td></tr>'
+					);
+				});
+			}
+		// add new book row
+		$(document).ready(function ready(){
+			$.get(link+'/books')
+			    .then(function getSuccess(res){
+			    	console.log(res);
+			    	refershTableInfo(res);
+			    })
+			    .catch(function getFailed(err){
+			    	console.log('Failed to get books');
+			    });
+			$('#addButton').click(function onAddBook(event) {
+				event.preventDefault();
+				var book = {};
+				book.id = $('#id').val();
+				book.name = $('#name').val();
+				book.price = $('#price').val();
+				book.author = $('#author').val();
+				addBook(book)
+					.then(function addSuccess(res) {
+						refershTableInfo(res);
+					})
+					.catch();
+			});
+			function addBook(book) {
+				// param: config object
+				return $.ajax({
+					url: link+'/books',
+					method: 'POST',
+					data: JSON.stringify(book),
+					contentType: 'application/json; charset=UTF-8'
+					// success: function(){}
+				});
+
+			}
+		});
+
+		//delete function
+		$(document).ready(function ready(){
+			$('tbody').on("click", "button.delete", function(event){
+				event.preventDefault();
+				var $this = $(this);
+				var $tr = $this.parent("tr");
+				$(".trClass").each(function(){
+					var tmp = $(this).children().eq(4);
+					var btn = tmp.children();
+					btn.bind("click", function deleteClick(event){
+						event.preventDefault();
+						var book ={};
+						book.id = btn.parent().parent().children("td").get(0).innerHTML;
+						rmvBook(book.id)
+							.then(function deleteSuccess(res) {
+								refershTableInfo(res);
+							})
+							.catch();	
+					});
+				});
+
+			});
+			function rmvBook(id){
+				return $.ajax({
+					url: link+'/books/'+ id,
+					method: 'DELETE',
+					contentType: 'application/json; charset=UTF-8'
+					// success: function(){}
+				});
+			}
+		});
+		//click edit to select into the edit box
+		$(document).ready(function ready(){
+			$('tbody').on("click", "button.edit", function(){
+				var $this = $(this);
+				var $tr = $this.parent("tr");
+				$(".trClass").each(function(){
+					var tmp = $(this).children().eq(4);
+					var btn = tmp.children();
+					btn.bind("click", function editClick(){
+						var eid = btn.parent().parent().children("td").get(0).innerHTML;
+						var ename = btn.parent().parent().children("td").get(1).innerHTML;
+						var eprice = btn.parent().parent().children("td").get(2).innerHTML;
+						var eauthor = btn.parent().parent().children("td").get(3).innerHTML;
+						$('#eid').val(eid);
+						$('#ename').val(ename);
+						$('#eprice').val(eprice);
+						$('#eauthor').val(eauthor);
+						
+					});
+				});
+
+			});
+		});
+
+		//submit the edit infor
+		$(document).ready(function ready(){
+			$('#editButton').click(function submitEdit(event){
+				event.preventDefault();
+				var book ={};
+				book.id = $('#eid').val();
+				book.name = $('#ename').val();
+				book.price = $('#eprice').val();
+				book.author = $('#eauthor').val();
+				updateBooks(book)
+					.then(function addSuccess(res) {
+						refershTableInfo(res);
+					})
+					.catch();
+			});
+			function updateBooks(book){
+				return $.ajax({
+					url: link+'/book',
+					method: 'PUT',
+					data: JSON.stringify(book),
+					contentType: 'application/json; charset=UTF-8'
+					// success: function(){}
+				});
+			}
+		});
+
+		$(document).ready(function ready(){
+			$('button.search').click(function filterSearch(){
+				var svalue = $('select').val();
+				var stext = $("select").find("option:selected").text(); 
+
+				var tds = $("td."+stext+":contains('"+($('#search').val())+"')");
+				//console.log(tds);
+				$('table tbody tr').hide();
+				for(var i=0; i<tds.length; i++){
+					//console.log(tds[i].innerHTML);
+					$('table tbody').find('tr').each(function(){
+						var tdArr = $(this).children();
+						var tt = tdArr.eq(svalue).text();
+						//console.log(tt);
+						if(tt == tds[i].innerHTML){
+							//	console.log($(this));
+							$(this).show();
+						}
+					})
+				}			
+			});
+
+		});
+		function sortTable(way ,index){
+			var table = document.getElementById("table")
+			var body = table.tBodies[0];
+			var rows = body.rows;
+			var a  = new Array;
+			for(var i=0;i<rows.length;i++){
+       			a.push(rows[i]);
+       		}
+       		a.sort(generateCompare(way, index));
+       		var frag=document.createDocumentFragment();
+   			for(var i=0;i<a.length;i++){
+       				frag.appendChild(a[i]);
+   			}
+   			body.appendChild(frag);
+		}
+
+		function generateCompare(way,index){
+    		return function compare(tr1,tr2){
+	    			var v1=tr1.cells[index].firstChild.nodeValue;
+					var v2=tr2.cells[index].firstChild.nodeValue;
+					if(way==0){ //序号列，降序
+		   				if(v1>v2)
+		      				return -1;
+		   				else if(v1<v2)
+			  				return 1;
+		  				 else 
+		     				 return 0;
+					}else{  
+		    			if(v1>v2)
+			  				 return 1;
+						else if(v1<v2)
+			  				 return -1;
+						else 
+			   		return 0;
+				}
+			}
+		}
+	</script>
+	<style>
+		#filter{
+			font-size: 40px;
+			font-family: arial;
+		}
+		#my02{
+   			width: 10px;
+   			height: 10px;
+    		border: 5px solid transparent;
+    		border-bottom: 5px solid green;
+    		}
+    	#my03{
+    		width: 10px;
+    		height: 10px;
+    		border: 5px solid transparent;
+    		border-top: 5px solid blue;
+    	}
+	</style>
+</head>
+<body>
+<div class="container">
+	<h1>Books</h1><br/>
+	<div class="row">
+		<div class="col-md-6">
+		<table class="table" id="table">
+		    <thead id="book" class="thead-light">
+		    <tr>
+			<th >			
+					ID					
+					<div id="my02" onclick="sortTable(1, 0)"></div>&nbsp
+					<div id="my03" onclick="sortTable(0, 0)"></div>
+			</th>
+			<th>
+				Name
+				<div id="my02" onclick="sortTable(1, 1)"></div>&nbsp
+				<div id="my03" onclick="sortTable(0, 1)"></div>
+			</th>
+			<th>Price</th>
+			<th>Author</th>
+			<th>Operation</th>
+		    </tr>
+	        </thead>
+	        <tbody>
+	        	
+	        </tbody>
+	    </table>
+		</div>
+		<div class="form-group col-md-2">
+			<p id="filter">Filter</p>	
+			<input type="text" id="search">	
+		</div>
+		<div class=" text-right form-group col-md-2">
+            <select name="" id="" class="form-control">
+                <option value="1">name</option>
+                <option value="2">price</option>
+                <option value="3">author</option>
+            </select>
+			<button class="btn btn-outline-primary search">Filter</button>
+        </div>
+	</div>
+	<div class="row">
+		<div class="col-md-6">
+			<div>
+			<form class="border border-dark was-validated">
+				<h4>Add Book</h4>
+				 <div class="form-group form-inline">
+				 	<label for="id" class="col-sm-2 control-label">ID:</label>
+				 	<div class="col-sm-10">
+        				<input type="number" class="form-control" id="id" placeholder="Enter ID" name="id"  required>
+        			</div>
+     			</div>
+     			<div class="form-group form-inline">
+				 	<label for="name" class="col-sm-2 control-label">Name:</label>
+				 	<div class="col-sm-10">
+        				<input type="text" class="form-control" id="name" placeholder="Enter Name" name="name"  required>
+        			</div>
+     			</div>
+     			<div class="form-group form-inline">
+				 	<label for="Price" class="col-sm-2 control-label">Price:</label>
+				 	<div class="col-sm-10">
+        				<input type="number" class="form-control" id="price" placeholder="Enter Price" name="price"  required>
+        			</div>
+     			</div>
+     			<div class="form-group form-inline">
+				 	<label for="author" class="col-sm-2 control-label">Author:</label>
+				 	<div class="col-sm-10">
+        				<input type="text" class="form-control" id="author" placeholder="Enter Author" name="author"  required>   
+        			</div>
+     			</div>
+     			<div class="form-group form-inline">
+     				<div class="col-sm-10">
+      					<button type="button" id="addButton" class="btn btn-outline-primary">Submit</button>
+      				</div>
+      			</div>
+
+			</form>
+			</div>
+		</div>
+		<div class="col-md-6">
+			<form class="border border-dark">
+				<h4>Edit Book</h4>
+				 <div class="form-group form-inline">
+				 	<label for="eid" class="col-sm-2 control-label">ID:</label>
+				 	<div class="col-sm-10">
+        				<input type="number" class="form-control" id="eid" placeholder="" name="eid"  readonly>
+        			</div>
+     			</div>
+     			<div class="form-group form-inline">
+				 	<label for="ename" class="col-sm-2 control-label">Name:</label>
+				 	<div class="col-sm-10">
+        				<input type="text" class="form-control" id="ename" placeholder="Enter Name" name="ename">
+        			</div>
+     			</div>
+     			<div class="form-group form-inline">
+				 	<label for="eprice" class="col-sm-2 control-label">Price:</label>
+				 	<div class="col-sm-10">
+        				<input type="number" class="form-control" id="eprice" placeholder="Enter Price" name="eprice">
+        			</div>
+     			</div>
+     			<div class="form-group form-inline">
+				 	<label for="euthor" class="col-sm-2 control-label">Author:</label>
+				 	<div class="col-sm-10">
+        				<input type="text" class="form-control" id="eauthor" placeholder="Enter Author" name="eauthor">   
+        			</div>
+     			</div>
+     			<div class="form-group form-inline">
+     				<div class="col-sm-10">
+      					<button type="button" id="editButton" class="btn btn-outline-primary">Submit</button>
+      				</div>
+      			</div>
+			</form>
+		</div>	
+	</div>
+
+
+</div>
+
+</body>
+</html>

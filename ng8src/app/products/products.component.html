@@ -1,0 +1,31 @@
+<h2>Products</h2>
+<main class="products-container">
+  <section class="products-filter-section">
+    <select name="" class="form-control" (change)="updateCurrencyCode($event)">
+      <!--      Compiler:
+             JIT:just in time
+             AOT:ahead of time
+  -->
+      <option [selected]=""cs.currencyCode ==='USD'" value="USD">US Dollar</option>
+      <option [selected]=""cs.currencyCode ==='CNY'" value="CNY">Chinese Yuan</option>
+      <option [selected]=""cs.currencyCode ==='JPY'" value="JPY">Japanese Yuan</option>
+    </select>
+    <label>
+      Min <input type="number" class="form-control" [(ngModel)]="min">
+    </label>
+    <label>
+      Max <input type="number" class="form-control" [(ngModel)]="max">
+    </label>
+  </section>
+  <section class="products-list-section">
+    <div class="products-list-container">
+      <!-- Parent Child Communication-->
+      <ng-container *ngIf="products">
+      <app-product-overview *ngFor = "let p of products | priceRange: min: max" [prod]="p"></app-product-overview>
+      </ng-container>
+    </div>
+  </section>
+</main>
+
+
+

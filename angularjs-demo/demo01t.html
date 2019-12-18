@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Demo 01</title>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+	<script type="text/javascript" src="js/angular.min.js"></script>
+	<script type="text/javascript">
+		// module: create an angularjs module
+		// 1st param: module name, 2nd param: dependency module array
+		var app = angular.module('mainApp', []); // create angular application module
+		// only 1 application module will be automatically bootstrapped
+
+		// for every controller, angularjs will create a $scope object 
+		// any property in $scope object can be bound in the view (html) of the controller
+		// $scope is from dependency injection by angularjs container(by name)
+		// In order to fix code minification, ['', fn] is used.
+		/*app.controller('firstCtrl', function firstCtrl($scope) {
+			$scope.msg = 'Hello World';
+		});*/
+		app.controller('firstCtrl', ['$scope', function firstCtrl($scope) {
+			$scope.msg = 'Hello World';
+		}]);
+		app.controller('secondCtrl', function secondCtrl() {
+			this.msg = 'Hello Again';
+		});
+	</script>
+</head>
+<body ng-app="mainApp" class="container">
+	<div ng-controller="firstCtrl">
+		<h2>First Part:</h2>
+		<!-- one way -->
+		<p>{{msg}}</p>
+		<button ng-click="msg = 'updated'" class="btn btn-success">Update</button>
+		<!-- two way -->
+		<h3>Two way: Model <===> View</h3>
+		<input class="form-control" type="text" ng-model="msg"></input>
+		<!-- one time -->
+		<h3> one time: Model -> view once</h3>
+		<p style="color: red;">{{::msg}}</p>
+	</div>
+	<div ng-controller="secondCtrl as sc">
+		<h2>Second Part:</h2>
+		<h4>{{sc.msg}}</h4>
+	</div>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Demo 04</title>
+    <script type="text/javascript" src = "./js/angular.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css"/>
+    <script type="text/javascript">
+        angular
+            .module('mainApp',[])
+            .controller('firstControl',['$scope',function firstCtrl($scope){
+            firstContro($scope, address)
+            $scope.msg = 'W';
+            $scope.address = address;
+            }])
+        /*  Service: an object which AngularJS creates in its container()
+        1. .value() use object literal to create a service object
+        2. .constant() service obj can't be decorated
+        3. .service() receive a constructo function to create a service object(most commonly used)
+        4. .factory() use a factory method to return the service object, Syntax is different from service,it can take advantage of closure
+        5. .provider() more powerful: angular js use provider to craete other services
+        */
+        //.value('address',{city:'Princeton'})
+        //     .constant('address',{city:'Princeton'})
+        //     .service('address', function addressService(){
+        //         this.city = 'Plainsboro';
+        //         this.state = 'NJ';
+        //     })
+        // .factory('address',function createAddressFactory(){
+        //     var country ='USA';
+        //     return {
+        //         city:'Boston',
+        //         state:'MA',
+        //         getCountry:function(){
+        //             return country;
+        //         }
+        //     };
+        // })
+        // var addressProvider = new AddressProvider();
+        .provider('address',function AddressProvider(){
+            this.$get = function AddressFactory(){
+                return {
+                    city:'Edison',
+                    state:'NJ'
+                };
+            };
+        })
+
+
+
+        //     // decorator - modify service 
+        // app.config(['$provide', function modeifyService($provide) {
+        //     // $delegate is a reference to the service object, similar to aop
+        //     $provide.decorator('address', ['$delegate', function doModification($delegate) {
+        //         $delegate.state = 'Garden State New Jersey';
+        //         return $delegate;
+        //     }]);
+        // }])
+            ;
+    </script>
+    
+</head>
+<body ng-app = 'mainApp'>
+    <div ng-container = 'mainCtrl'>
+        {{address.city}}
+        {{address.state}}
+    </div>
+    
+</body>
+</html>

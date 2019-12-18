@@ -1,0 +1,30 @@
+<div fxLayout fxLayoutAlign="center" style="margin: 50px 50px;">
+  <mat-card fxLayout="column" fxFlex="1 1 50%" fxFlex.lt-sm="1 1 auto">
+    <mat-card-title>Register</mat-card-title>
+    <form fxLayout="column">
+      <mat-form-field>
+        <mat-placeholder>Username</mat-placeholder>
+        <input type="text" matInput formControlName="username">
+        <mat-error *ngIf="registerFormGroup.get('username').getError('required')">Username can't be empty</mat-error>
+        <mat-error *ngIf="registerFormGroup.get('username').getError('minlength')">Username has to be no less tha 3 character long</mat-error>
+<!--        <input type="text" matInput>-->
+      </mat-form-field>
+      <div fxLayout="column" [formControlName]="'password'">
+        <mat-form-field>
+          <mat-placeholder>Password</mat-placeholder>
+          <input type="password" matInput formControlName="password">
+        </mat-form-field>
+        <mat-form-field>
+          <mat-placeholder>Confirm Password</mat-placeholder>
+          <input type="password"  matInput formControlName="confirmpassword  ">
+        </mat-form-field>
+        <mat-error>
+          {{registerFormGroup.get('passwords').getError('password dont macth')}}
+        </mat-error>
+      </div>
+      <p>
+        <button type="submit" mat-raised-button color="primary">Register</button>
+      </p>
+    </form>
+  </mat-card>
+</div>

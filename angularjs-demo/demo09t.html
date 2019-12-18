@@ -1,0 +1,83 @@
+<!-- Digest Cycle -->
+<!-- 
+	How angular synchronize model and view?
+		digest cycle
+			- run all the watchers in watch list
+				update view if changes, watch function: dirty check
+			- Normally will execute digest cycle 2 times if value changed
+			- It will run from rootScope to bottom
+			- Will run maximum 10 times and throw errors
+				$scope.x = [];
+				$scope.$watch('x', function() {
+					$scope.x = [];
+					console.log($scope.x);
+				});
+		When model change? Will trigger digest cycle
+			1. browser events
+			2. Ajax requests
+			3. timed events
+		Watcher List
+			array of watchers functions
+				build in: data-binding in view, custom: $scope.$watch
+		2 ways to manually tiger $scope.$apply() $scope.$digest()
+			$digest will run from current scope. apply from root
+
+
+
+ -->
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Demo 09</title>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+	<script type="text/javascript" src="js/angular.min.js"></script>
+	<script type="text/javascript" src="js/angular-sanitize.min.js"></script>
+	<script type="text/javascript">
+		var app = angular.module('mainApp', ['ngSanitize']);
+		app.controller('mainCtrl', ['$scope', '$rootScope', '$sce', '$timeout',
+			function mainCtrl($scope, $rootScope, $sce, $timeout) {
+				$rootScope.$watch(function() {
+					console.log('DG starts');
+				});
+
+				$scope.msg = '<p style="color: red;" onclick="alert(\'Go...\');">Click to win 1000.00</p>';
+				$scope.msg2 = $sce.trustAsHtml('<p style="color: red;">Click to win 1000.00</p>');
+
+				$scope.x = 10;
+				setTimeout(function testDigest() {
+					$scope.x = 20;
+					// $scope.$apply(); // will trigger rootScope watch
+					// $scope.$digest();
+				}, 2000);
+				// angularjs way of using timeout
+				$timeout(function testDigest() {
+
+				});
+				$scope.count = 5;
+			}]);
+		app.directive('incCount', function incXDirective() {
+			return {
+				scope: false,
+				link: function link($scope, iElem) {
+					// a case not under angular context
+					iElem.on('click', function() {
+						$scope.count++;
+					})
+				}
+			};
+		});
+	</script>
+</head>
+<body ng-app="mainApp">
+	<div ng-controller="mainCtrl">
+		<!-- xss attack -->
+		<div ng-bind-html="msg"></div>
+		<div ng-bind-html="msg2"></div>
+		<p>{{x}}</p>
+		<!-- use angular functions will put them in angular context
+			 will trigger digest-cycle  -->
+		<button ng-click="">empty</button>
+		<button inc-count>increase {{count}}</button>
+	</div>
+</body>
+</html>

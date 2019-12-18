@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Demo 04</title>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+	<script type="text/javascript" src="js/angular.min.js"></script>
+	<script type="text/javascript">
+		var app = angular.module('mainApp', []);
+		app.controller('mainCtrl', ['$scope', 'address', 'counter', function mainCtrl($scope, address, counter) {
+			$scope.address = address;
+			$scope.counter = counter;
+			counter.setCount(10);
+		}]);
+		// service: an object which angularjs creates in its container;
+		// 1. .value()  use object literal to create a service object
+		// 2. .constant() service object can't be decorated
+		// 3. .service()  receive a constructor function to create service object
+		// 4. .factory() use a factory method to return the service object
+		// 		syntax is different from service, can take advantage of closure
+		/* 5. .provider() more powerful
+		app.value('address', {city: ''});
+		app.constant('address', {city: ''});
+		// decorator - modify service 
+		app.config(['$provide', function modeifyService($provide) {
+			// $delegate is a reference to the service object, similar to aop
+			$provide.decorator('address', ['$delegate', function doModification($delegate) {
+				$delegate.state = 'Garden State New Jersey';
+				return $delegate;
+			}]);
+		}])
+		
+		app.service('address', function myService() {
+			this.city = 'Princeton';
+			this.state = 'NJ';
+		});
+		
+		app.factory('address', function createAddressFactory() {
+			return {
+				city: 'Princeton',
+				state: 'NJ'
+			};
+		});*/
+		app.factory('counter', function counterFactory() {
+			var count = 0;
+			return {
+				getCount: function() {return count;},
+				setCount: function(c) {count = c;}
+			};
+		});
+		
+		// constructor function for service provider object
+		// AddressProvider - var addressProvider = new AddressProvider()
+		// var address = addressProvider.$get()
+		// Raw/initial way to create service. Angular use provider to create others
+		app.provider('address', function AddressProvider() {
+			this.suffix = '';
+			// factory function to provide service object
+			this.$get = function addressFactory() {
+				return {
+					city: 'Princeton',
+					state: 'NJ' + this.suffix
+				};
+			};
+		});
+		// service name + provider
+		app.config(['addressProvider', function getAddressProvider(addressProvider) {
+			addressProvider.suffix = ' - Garden State';
+			console.log(addressProvider);
+		}])
+
+	</script>
+</head>
+<body class="container" ng-app="mainApp">
+	<div ng-controller="mainCtrl">
+		<p>{{address}}</p>
+		<p>{{'counter:' + counter.getCount()}}</p>
+	</div>
+</body>
+</html>

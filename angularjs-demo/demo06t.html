@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Demo 06</title>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+	<script type="text/javascript" src="js/angular.min.js"></script>
+	<script type="text/javascript">
+		var app = angular.module('mainApp', []);
+		app.controller('mainCtrl', ['$scope', function mainCtrlController($scope) {
+			$scope.msg = "hello filter";
+			$scope.orderList = [
+                {id: 10, name: "Laptop", qty: 20, price: 100},
+                {id: 20, name: "Rasor", qty: 2, price: 350},
+                {id: 30, name: "Desk", qty: 50, price: 20},
+                {id: 40, name: "Microwave", qty: 25, price: 30},
+                {id: 50, name: "Suitecase", qty: 32, price: 71},
+            ];
+            $scope.search = '';
+            $scope.searchByName = {
+            	name: ''
+            };
+            $scope.reverse = false;
+            $scope.sortBy = function sortBy(field) {
+            	$scope.reverse = $scope.field === field ? !$scope.reverse : false;
+            	$scope.field = field;
+            };
+		}]);
+
+		// filter factory pattern
+		app.filter('reverse', function reverseFilter() {
+			// filter fn angular will invoke
+			return function reverseCallback(str) {
+				return str.split('').reverse().join('');
+			};
+		});
+		app.filter('priceRange', function priceRangeFilter() {
+			return function priceRangeCallback(arr, min, max) {
+				min = min || Number.MIN_VALUE;
+				max = max || Number.MAX_VALUE;
+				return arr.filter(function arrFilter(item) {
+					return item.price > min && item.price < max;
+				});
+			}
+		})
+	</script>
+</head>
+<body ng-app="mainApp" class="container">
+	<div ng-controller="mainCtrl">
+		<h2>Filter - a function which transforms data displayed in the view from one format to another</h2>
+		<p>{{msg | reverse}}</p>
+		<p>{{msg | uppercase}}</p>
+		<p>{{100 | currency}}</p>
+
+		<!-- Filter -->
+		<p>Search all columns: <input class="form-control" type="text" ng-model="search"></p>
+		<p>Search by name: <input class="form-control" type="text" ng-model="searchByName.name"></p>
+		<p>Min Price: <input class="form-control" type="number" ng-model="min"></p>
+		<p>Max Price: <input class="form-control" type="number" ng-model="max"></p>
+		<table class="table table-bordered table-striped">
+			<thead>
+				<tr>
+					<th ng-click="sortBy('id')">ID</th>
+					<th ng-click="sortBy('name')">Name</th>
+					<th ng-click="sortBy('qty')">Qty</th>
+					<th ng-click="sortBy('price')">Price</th>
+				</tr>
+			</thead>
+			<tbody>
+				<tr ng-repeat="order in orderList  | filter: search | filter: searchByName | priceRange: min: max | orderBy: field: reverse">
+					<td>{{order.id}}</td>
+					<td>{{order.name}}</td>
+					<td>{{order.qty}}</td>
+					<td>{{order.price}}</td>
+				</tr>
+			</tbody>
+		</table>
+	</div>
+</body>
+</html>

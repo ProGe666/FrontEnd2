@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+        <title>Demo 02</title>
+        <script type="text/javascript" src = "./js/angular.min.js"></script>
+        <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css"/>
+
+           
+    <script type ="text/javascript">
+    //what design patterns are used in AngularJS/Angular?
+    angular
+        .module('mainApp',[])
+        .controller('firstControl',['$scope',function firstCtrl($scope){
+            $scope.msg ='it works'; $scope.itemList = [
+                {itemNo: "A001", price: 10, qty: 30, inStock: true},
+                {itemNo: "A002", price: 20, qty: 3, inStock: true},
+                {itemNo: "A003", price: 25, qty: 5, inStock: false},
+                {itemNo: "A004", price: 15, qty: 8, inStock: true}
+            ];
+            $scope.user = {
+                name:'Alice',
+                age: 26
+            };
+
+            $scope.addItem = function addItem({
+            $scope.itemList.push(){
+
+            }
+            });  
+        }]);
+       
+            
+    </script>
+</head>
+<body ng-app ="mainApp" class="container">
+    <div ng-controller ="firstControl">
+        <form class="form-group">
+            Name:<input type = "text" class = "form-control" ng-model="user.name">
+            Age:<input type = "number" class = "form-control" ng-model= "user.age">
+        </form> 
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>ItemNo</th>
+                    <th>price</th>
+                    <th>qty</th>
+                    <th>inStock</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- one time binding ====> ::-->
+                <!-- why use one time bind-->
+                <tr ng-repeat="item in ::itemList">
+                    <td>{{::item.itemNo}}</td>
+                    <td>{{::item.price}}</td>
+                    <td>{{::item.qty}}</td>
+                    <td>{{::item.inStock}}</td>
+                </tr>
+            </tbody>
+        </table>
+        <button class ="btn btn-danger" ng-click="addItem($event);">Add Item</button>
+           <!-- if a variable dosen't exist on $scope,angularjs will create for you-->
+        <h2>Conditional Binding</h2>
+        <input type="checkbox" ng-model=flag>
+        <!--  dosplay.com  -->
+        <p ng-show="flag">Login</p>
+        d<!---->
+        <p ng-if="flag">Logout</p>
+    </div>
+    
+</body>
+</html>

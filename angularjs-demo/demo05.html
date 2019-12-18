@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>demo 05</title>
+    <script type="text/javascript" src = "./js/angular.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css"/> 
+
+    <script type = 'text/javascript'>
+    angular
+        .module('mainApp',[])
+        .controller('firstCtrl',['$scope',function ($scope){
+            $scope.msg ='from firstCtrl';
+            $scope.a ='bob';
+            $scope.b ={
+                name:'bob',
+                age: 20
+            }
+            $scope.c = function getName(name){
+                return name;
+            }
+        }])
+
+        //restrict:
+        // .directive('myCard',function myCardDirective(){
+        //     //comfiguration object for custom directive
+        //     return {
+        //         template:'<div style= "border: 1px solid red; width:300px; height:250px"><h4>Harry Potter</h4><p>Avda kedavra</p><div>'
+        //     };
+        // })
+        .directive('myAttr',function myAttrDirective(){
+            //comfiguration object for custom directive
+            return {
+                //A stands for Attribute
+                //by default, AE is the value
+                restrict:'A',//'AE'
+                controller:['$scope',function myAttrDirectiveController($scope){
+                    $scope.x = 'from myAttr';
+                    console.log($scope);
+                }],
+                template: '<span>hello Attrubute Directive ,{{msg}},{{x}},{{a}} {{b}},{{f}}</span><input type="text" ng-model=b.name>',
+                //scope: whether angularjs will create its own scope , default:false, meaning it will use parent's scope(firstCtrl)
+                //true means will create ites own
+                //{} isolated scope, no access between scopes
+                //scope:true
+                scope:{
+                    a:'@' ,//string binding
+                    b:'=' ,// two way binding
+                    f='&'
+                }
+                //bindToController Angular JS 1.5
+            };
+        })
+        /*
+        directive is a marker to add on existing HTML element which can provide additional functionalities(DOM contents,styles,DOM manipulations,event handlers)
+        */
+       .directive("myElem",function myElemDirective(){
+            return {
+                //E stands for Element
+                restrict:'E',
+                template: '<div><span> hello Element Directive</span><ng-transclude></ng-transclude></div>',
+                //replace:true,
+                //transform+include===>transclude
+                transclude: true 
+            };
+       })
+       .directive('myClass',function myClassDirective(){
+           //C stands for class
+           return {
+               restrict: 'C',
+               template:'<li>Hello Class Directive</li>'
+           };
+       })
+       .directive('myComment',function myCommentDirective(){
+           //M stands for comment
+           return {
+               restrict: 'M',
+               template:'<li>Hello Comment Directive</li>',
+               replace:true
+           };
+       })
+       .directive('colorRedAlertHello',function crahDirective(){
+        //comfiguration object for custom directive
+           return {
+               restrict:'A',
+               //template:'<div>new content</div>'  // replace it
+               //1st 
+               //template element , template attribute
+             /*
+               compile: function compile(tElem,tAttr){
+                   //if don't have template , it turn to  <p color-red-alert-hello>I should be red</p>
+                   //angular js internally is jqlite(jQuerylite)  tElem(angular js object which is use jqlite)
+
+                     //.html() return every element
+               //data is not linked in compile phase
+               //compile phase is not stable
+            
+                console.log(tElem.html());
+                tElem.css('color','red');
+                tElem.on('click',function onClick(){
+                    alert("hello");
+                });
+                // return {
+                //     //pre-link
+                //     pre:function(){},
+                //     //post-link:most stable one
+                //     //all you DOM manipulation should be with in post link
+                //     post:function(){}
+                // };
+               },*/
+               link: function postLink($scope,iElem,iAttr){
+                   //return link and this only need one
+                   console.log(iElem.text());
+               }
+           };
+       })
+        ;
+    </script>
+   
+</head>
+<body ng-app = "mainApp">
+    <div ng-controller="firstCtrl">
+        <h1>Custom Directive</h1>
+        <p>{{x}}</p>
+        <input type="text" ng-model=b.name>
+        <h2>Attribute Directive</h2>
+        <ul>
+            <li my-attr a ={{a}} b ="b" f="c(a)"></li> <!-- {{pair controller}}    "b" path like a string b-->
+        </ul>
+        <h2>Element Directive</h2>
+        <ul>
+            <li>
+                <my-elem>
+                    Hello,I'm achild of my-elem
+                </my-elem>
+            </li>
+        </ul>
+        <h2>Class Directive</h2>
+        <ul>
+            <li class ="my-class"></li>
+        </ul>
+        <h2>Comment Directive</h2>
+        <ul>
+            <li>
+                <!-- directive: my-comment-->
+            </li>
+        </ul>
+        <h2>Playground</h2>
+        <p color-red-alert-hello>I should be red</p>
+
+    </div>
+    
+</body>
+</html>

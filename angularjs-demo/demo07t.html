@@ -1,0 +1,147 @@
+<!-- 
+	install live server: npm i live-server -g
+	live-server to start
+
+	ngRoute doesn't support nested routing
+	ui-router does
+ -->
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Demo 07</title>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+	<script type="text/javascript" src="js/angular.min.js"></script>
+	<script type="text/javascript" src="js/angular-route.min.js"></script>
+	<script type="text/javascript">
+		var app = angular.module('mainApp', ['ngRoute']);
+		// config route service
+		app.config(['$routeProvider', function($routeProvider) {
+			$routeProvider.when('/home', {
+				templateUrl: 'template/home.html'
+			})
+			.when('/users', {
+				templateUrl: 'template/users.html'
+			})
+			.when('/add-user', {
+				templateUrl: 'template/add-user.html'
+			})
+			.when('/edit-user/:name', {
+				templateUrl: 'template/edit-user.html',
+				controller: [
+					'$scope',
+					'$routeParams',
+					function editUserController($scope, $routeParams) {
+						$scope.name = $routeParams.name;
+				}]
+			})
+			.otherwise({
+				redirectTo: '/home' // redirect to home if not matching any
+			});
+		}]);
+		app.controller('mainCtrl', ['$scope', '$http', function mainCtrlController($scope, $http) {
+			$scope.users = [];
+			$scope.getUsers = function getUsers() {
+				$http.get('http://localhost:3000/users')
+					.then(function getUsersSuccess(res) {
+						$scope.users = res.data;
+					})
+					.catch(function getUsersFailed(err) {
+						console.log(err);
+					});
+			};
+			
+
+			$scope.deleteUser = function deleteUser(user) {
+				$http.delete('http://localhost:3000/users/' + user.name)
+					.then(function deleteStudentSuccess() {
+						console.log('delete success!');
+						$scope.getUsers();
+					});
+			};
+			$scope.getUsers();
+			/*var self = this;
+			self.fetchStudent = function fetchStudent() {
+				$http.get('http://localhost:3000/students')
+					.then(function getStudentsSuccess(res) {
+						$scope.students = res.data;
+					})
+					.catch(function getStudentsFailed(err) {
+						console.log(err);
+					});
+			};
+			self.deleteRow = function deleteRow(student) {
+				$http.delete('http://localhost:3000/students/' + student.name)
+					.then(function deleteStudentSuccess() {
+						alert('delete success!');
+						self.fetchStudent();
+					})
+			};
+			self.fetchStudent();*/
+		}]);
+	</script>
+	<style type="text/css">
+		.navbar-header {
+			user-select: none;
+		}
+		.pointer {
+			cursor: pointer;
+		}
+	</style>
+</head>
+<body ng-app="mainApp">
+	<div ng-controller="mainCtrl as mc">
+		<div class="navbar navbar-default">
+			<!-- Single Page Application -->
+			<span class="navbar-header navbar-brand">SPA - Students Table</span>
+			<div class="container">
+			<!-- ngRoute 
+				Step 1. add # in front of page name
+				Step 2. add ngRoute module and config
+				Step 3. add ng-view
+
+				// amazon is not spa as it's supporting SEO(search engine optimization)
+			-->
+			<ul class="nav navbar-nav">
+				<li>
+					<a href="#/home">Home</a>
+				</li>
+				<li>
+					<a href="#/users">Users</a>
+				</li>
+				<li>
+					<a href="#/add-user">Add User</a>
+				</li>
+			</ul>	
+			</div>
+
+		</div>
+		
+		<!-- ng view will mark the div as placeholder to load ngRoute content -->
+		<div  ng-view></div>
+		<div class="container">
+			<hr>
+			<table class="table table-bordered table-striped">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th>Age</th>
+						<th>Score</th>
+						<th>City</th>
+						<th>State</th>	
+					</tr>
+				</thead>
+				<tbody>
+					<tr ng-repeat="student in students" class="pointer" ng-click="mc.deleteRow(student);">
+						<td>{{student.name}}</td>
+						<td>{{student.age}}</td>
+						<td>{{student.score}}</td>
+						<td>{{student.address.city || 'Unknown'}}</td>
+						<td>{{student.address.state || 'Unknown'}}</td>
+					</tr>
+				</tbody>
+			</table>	
+		</div>
+	</div>
+
+</body>
+</html>

@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Demo 03</title>
+    <script type="text/javascript" src = "./css/bootstrap.min.css"></script>
+    <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css"/>
+
+    <style type ="text/css">
+    [ng-controller ="mainCtrl"]{
+        width:400px;
+        height:600px;
+        border:4px solid;
+        padding:5px;
+    }
+    [ng-controller ="firstCtrl"]{
+        width:300px;
+        height:230px;
+        border:2px dotted red;
+        padding:5px;
+    }
+    [ng-controller ="secondCtrl"]{
+        width:300px;
+        height:230px;
+        border:2px blueviolet;
+        padding:5px;
+    }
+    </style>
+
+    <script type = "text/javascript">
+        var app = angular.module('mainApp',[]);
+        app.controller('mainCtrl',['$scope', function firstCtrl($scope){
+            
+        }]);
+        app.controller('firstCtrl',['$scope', function firstCtrl($scope){
+            $scope.msg = 'works';
+        }]);
+        app.controller('secondCtrl',['$scope', function firstCtrl($scope){            
+        }]);
+    </script>
+</head>
+<body ng-app ="mainApp">
+    <div ng-controller ="mainCtrl">
+        <h4>----------mainCtrl---------</h4>
+        <p>x:{{x}}</p>
+        <p>y:{{y}}</p>
+    <div ng-controller ="firstCtrl">
+        <h4>----------firstCtrl---------</h4>
+        <p>x:{{x}}</p>
+        <p>y:{{y}}</p>
+    </div>
+    <div ng-controller ="secondCtrl">
+        <h4>----------secondCtrl---------</h4>
+        <p>x:{{x}}</p>
+        <p>y:{{y}}</p>
+        <p>test rootSccope:{{root}}</p>
+    </div>
+    </div>    
+</body>
+</html>

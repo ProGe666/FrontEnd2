@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Demo 05</title>
+	<link rel="stylesheet" type="text/css" href="css/bootstrap.min.css">
+	<script type="text/javascript" src="js/angular.min.js"></script>
+	<script type="text/javascript">
+		var app = angular.module('mainApp', []);
+		app.controller('mainCtrl', ['$scope', function mainCtrl($scope) {
+			$scope.y = 'from mainCtrl!';
+			$scope.name = 'bob';
+			$scope.user = {
+				name: 'alice',
+				age: 21
+			};
+			$scope.hello = function sayHello(num) {
+				return 'hello from main! ' + num;
+			};
+
+			$scope.message = 'Message from parent which is rendered nicely!';
+
+			$scope.flag = true;
+		}]);
+	/*
+		Directive is a marker to add on existing HTML element
+		 which can provide additional functionalities(DOM contents,
+		 styles, DOM manipulations, event handlers)
+	 */
+	 	app.directive('myAttr', function myAttrDirective() {
+	 		// configuration object for custom directive
+	 		return {
+	 			// AECM, default value is 'AE'
+	 			restrict: 'A',
+	 			// contents custom directive will carry/hold/replace
+	 			template: '<span>Hello Attribute Directive{{x}} {{y}}</span>',
+	 			controller: ['$scope', function myAttrDirectiveController($scope) {
+	 				$scope.x  = 'from myAttr!';
+	 				/*$scope.x = 0;
+	 				setInterval(function() {
+	 					$scope.x ++; 
+	 				},500);*/
+	 			}],
+	 			// scope - whether it creates its own scope, default: false
+	 			//  	   meaning it will use parent's scope (mainCtrl)
+	 			scope: false
+
+	 		};
+	 	});
+	 	app.directive('myElem', function myElemDirective() {
+	 		// configuration object for custom directive
+	 		return {
+	 			// AECM, default value is 'AE'
+	 			restrict: 'E',
+	 			// contents custom directive will carry/hold/replace
+	 			template: '<li>Hello Element Directive {{x}} {{y}} {{z}}</li>',
+	 			// whether template replace original content, default: false
+	 			replace: true,
+	 			controller: ['$scope', function myElemDirectiveController($scope) {
+	 				$scope.z  = 'from myElem!';
+	 			}],
+	 			// create a new scope that will inherit parent's scope
+	 			scope: true
+	 		};
+	 	});
+	 	app.directive('anotherElem', function anotherElemDirective() {
+	 		// configuration object for custom directive
+	 		return {
+	 			// restrict default value is 'AE'
+	 			// contents custom directive will carry/hold/replace
+	 			template: '<li color-red-alert-hello>Another Element Directive: {{x}} {{y}} {{n}} {{u}} {{h()}} </li><ng-transclude></ng-transclude>',
+	 			// whether template replace original content, default: false
+	 			//replace: true,
+	 			controller: ['$scope', function myElemDirectiveController($scope) {
+	 				setTimeout(function() {
+	 					console.log($scope.h());
+	 				},2000)
+
+	 				console.log('controller in another-elem.');
+	 			}],
+	 			// Isolated scope, no access between other scopes
+	 			scope: {
+	 				// @ = & 
+	 				n: '@', // string binding
+	 				u: '=', // two way binding
+	 				h: '&' // function binding
+	 			},
+	 			transclude: true,
+	 			compile: function compile(tElem, tAttr, ) {
+	 				// 1. compiling phase
+	 				console.log('compiling in another-elem');
+	 				// AngularJS has built-in jqLite
+	 				/*console.log(tElem); // jQuery object for host element
+	 				console.log(tAttr); // contains all the attrs on host element*/
+	 				return {
+	 					// difference between pre and post?
+	 					pre: function pre($scope, iElem, iAttrs) {
+	 						console.log('pre-linking in another-elem');
+	 					},
+	 					post: function post($scope, iElem, iAttrs) {
+							console.log('post-linking in another-elem');
+	 					}
+	 				};
+	 			}
+	 		};
+	 	});
+	 	app.directive('myClass', function myClassDirective() {
+	 		// configuration object for custom directive
+	 		return {
+	 			// AECM, default value is 'AE'
+	 			restrict: 'C',
+	 			// contents custom directive will carry/hold/replace
+	 			template: '<li>Hello Class Directive</li>'
+	 		};
+	 	});
+	 	app.directive('myComment', function myCommentDirective() {
+	 		// configuration object for custom directive
+	 		return {
+	 			// AECM, default value is 'AE'
+	 			restrict: 'M',
+	 			// contents custom directive will carry/hold/replace
+	 			template: '<li>Hello Comment Directive</li>',
+	 			replace: true,
+	 		};
+	 	});
+
+
+	 	app.directive('colorRedAlertHello', function crahDirective() {
+	 		return {
+	 			restrict: 'A',
+	 			controller: ['$scope', function crahController($scope) {
+	 				console.log('controller in colorRedAlertHello');
+	 			}],
+	 			// compiling phase
+	 			compile: function compile(tElem, tAttr) {
+	 				console.log('compile in color-red-alert-hello');
+	 				// DOM manipulation on host element in compile function
+	 				// compile is executed before controller
+	 				// compile can't access $scope(data)
+	 				tElem.css('color', 'red');
+	 				tElem.on('click', function() {
+	 					alert('hello');
+	 				});
+	 				// linking phase:
+	 				// 1. pre-linking - controller + pre link function
+	 				// 2. post-linking - execute  from bottom to top
+	 				// DOM manipulation with data for host element
+	 				return {
+	 					// difference between pre and post?
+	 					pre: function pre($scope, iElem, iAttrs) {
+	 						console.log('pre-linking in color-red-alert-hello');
+	 					},
+	 					post: function post($scope, iElem, iAttrs) {
+							console.log('post-linking in color-red-alert-hello');
+	 					}
+	 				};
+	 			},
+	 		}
+	 	});
+
+
+	 	app.directive('myShow', function myShowDirective() {
+	 		return {
+	 			scope: {
+	 				myShow: '='
+	 			},
+	 			link: function link($scope, iElem, iAttr) { // post-link function
+	 				$scope.$watch('myShow', function() {
+		 				if($scope.myShow) {
+		 					iElem.css('display', '');
+		 				} else {
+		 					iElem.css('display', 'none');
+		 				}
+	 				})
+	 				
+	 			}
+	 		};
+	 	});
+	 	app.directive('myIf', function() {
+	 		// will be link function
+	 		return {
+	 			scope: {
+	 				myIf: '='
+	 			},
+	 			link: function($scope, iElem, iAttrs) {
+	 				var $parent = iElem.parent();
+	 				$scope.$watch('myIf', function(newMyIf) {
+	 					if(newMyIf) {
+	 						$parent.append(iElem);
+	 					} else {
+	 						iElem.remove();
+	 					}
+	 				})
+	 			}
+	 		};
+	 	});
+	</script>
+</head>
+<body ng-app="mainApp" class="container">
+	<div ng-controller="mainCtrl">
+		<h1>Custom Directive</h1>
+			<p>y: {{y}}</p>
+			<p>x: {{x}}</p>
+			<p>z: {{z}}</p>
+
+		<h2>Attribute Directive</h2>
+			<ul>
+				<li my-attr></li>
+			</ul>
+		<h2>Element Directive</h2>
+			<ul>
+				<my-elem></my-elem>
+				<another-elem n="{{name}}" u="user" h="hello(x)">
+					<span class="text-danger"><strong>{{message}}</strong></span>
+				</another-elem>
+			</ul>
+		<h2>Class Directive</h2>
+			<ul>
+				<li class="my-class"></li>
+			</ul>
+		<h2>Comment Directive</h2>
+			<ul>
+				<!-- directive: my-comment everything will be value passed in-->	
+			</ul>
+		<h2>Compile and Link</h2>
+			<ul>
+				<!-- <li color-red-alert-hello>color red alert hello</li>
+				<li color-red-alert-hello></li> -->
+			
+				<li>
+					<input type="checkbox" ng-model="flag">
+					<div my-show="flag">Hide and Seek</div>
+				</li>
+			</ul>
+
+	</div>
+
+</body>
+</html>
+
+
+<!-- 
+top to bottom
+	|			ng-app
+	|			ng-controller
+	|			another-elem
+	|			color-red-alert-hello
+	v
+
+post link is more stable
+
+can't use compile and link function together,
+do compile and return {pre:fn, post: fn} if needed
+
+tElem: template DOM meaning data not linked
+iElem: instance DOM, meaning data is linked
+ -->
+
